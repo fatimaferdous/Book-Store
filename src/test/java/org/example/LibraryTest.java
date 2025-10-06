@@ -29,4 +29,16 @@ public class LibraryTest {
         String title = book.getTitle();
         assertEquals("Great Gatsby",title);
     }
+
+    @Test
+    @DisplayName("Check all book statuses are set to available")
+    void RESP_01_test_03(){
+        InitializeLibrary init = new InitializeLibrary();
+        Catalogue catalogue = init.initializeLibrary();
+
+        for (int i = 0; i < catalogue.getCatalogueSize(); i++) {
+            Book b = catalogue.getBook(i);
+            assertEquals(BookStatus.AVAILABLE, b.getStatus());
+        }
+    }
 }
