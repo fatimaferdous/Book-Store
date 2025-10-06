@@ -1,0 +1,32 @@
+package org.example;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class LibraryTest {
+
+    @Test
+    @DisplayName("Check library catalogue size is 20")
+    void RESP_01_test_01(){
+        InitializeLibrary library = new InitializeLibrary();
+        Catalogue catalogue = library.initializeLibrary();
+
+        int size = catalogue.getCatalogueSize();
+
+        assertEquals(20, size);
+
+
+    }
+    @Test
+    @DisplayName("Check library catalogue for valid book - Great Gatsby.")
+    void RESP_01_test_02(){
+
+        InitializeLibrary library = new InitializeLibrary();
+        Catalogue catalogue = library.initializeLibrary();
+
+        Book book = catalogue.getBook(0);
+        String title = book.getTitle();
+        assertEquals("Great Gatsby",title);
+    }
+}
