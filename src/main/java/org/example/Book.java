@@ -4,7 +4,7 @@ public class Book {
     String title;
     String author;
 
-    BookStatus status = BookStatus.CHECKED_OUT;
+    BookStatus status = BookStatus.AVAILABLE;
 
     Book(String title, String author){
         this.title = title;
