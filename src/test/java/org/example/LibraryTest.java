@@ -41,4 +41,24 @@ public class LibraryTest {
             assertEquals(BookStatus.AVAILABLE, b.getStatus());
         }
     }
+
+    @Test
+    @DisplayName("check initialized 3 borrower accounts")
+    void RESP_02_test_01(){
+        Users user = new InitializeUsers().initializeUsers();
+        assertEquals(3, user.size());
+    }
+
+    @Test
+    @DisplayName("Check all borrower accounts have zero borrowed books initially")
+    void RESP_02_test_02(){
+        Users users = new InitializeUsers().initializeUsers();
+
+        int maxBorrowed = -1;
+        for (int i = 0; i < users.size(); i++) {
+            int c = users.get(i).getBorrowedCount();
+            if (c > maxBorrowed) maxBorrowed = c;
+        }
+        assertEquals(0, maxBorrowed);
+    }
 }
