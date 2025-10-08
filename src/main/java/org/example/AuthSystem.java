@@ -12,28 +12,35 @@ public class AuthSystem {
     }
 
     public void promptLogin(Scanner input, PrintWriter output) {
-        output.println("Enter username:");
-        String username = input.nextLine().trim();
 
-        output.println("Enter password:");
-        String password = input.nextLine().trim();
+        while (true) {
+            output.println("Enter username:");
+            if (!input.hasNextLine()) break;
+            String username = input.nextLine().trim();
 
-        Borrow borrower = users.findByUsername(username);
-        if (borrower != null && borrower.passwordMatches(password)) {
-            currentUser = borrower;
-            output.println("Login successful. Welcome, " + username + "!");
+            output.println("Enter password:");
+            if (!input.hasNextLine()) break;
+            String password = input.nextLine().trim();
 
-            checkNotifications(output);
+            Borrow borrower = users.findByUsername(username);
+            if (borrower != null && borrower.passwordMatches(password)) {
+                currentUser = borrower;
+                output.println("Login successful. Welcome, " + username + "!");
 
-            displayMenu(output);
+                checkNotifications(output);
 
-            String choice = input.hasNextLine() ? input.nextLine().trim() : "";
-            if (choice.equals("3")) {
-                logout(output);
+                displayMenu(output);
+
+                String choice = input.hasNextLine() ? input.nextLine().trim() : "";
+                if (choice.equals("3")) {
+                    logout(output);
+                    break;
+                }
+
+            } else {
+                output.println("Invalid credentials.");
             }
 
-        } else {
-            output.println("Invalid credentials.");
         }
     }
 
