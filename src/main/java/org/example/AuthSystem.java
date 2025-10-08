@@ -24,4 +24,8 @@ public class AuthSystem {
             output.println("Invalid credentials.");
         }
     }
+
+    public Borrow getCurrentUser(){
+        return null;
+    }
 }

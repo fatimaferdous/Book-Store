@@ -86,4 +86,92 @@ public class LibraryTest {
         boolean success = out.contains("Login successful");
         assertTrue(success, "Expected successful login message in output");
     }
+
+    @Test
+    @DisplayName("checks for session created")
+    void RESP_04_test_01() {
+        String simulatedInput = "alice\npass1\n";
+        StringWriter simulatedOutput = new StringWriter();
+
+        Scanner input = new Scanner(simulatedInput);
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        InitializeUsers init = new InitializeUsers();
+        Users users = init.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        // The borrower logs in successfully
+        auth.promptLogin(input, output);
+
+        // Expect the current user to be stored
+        Borrow current = auth.getCurrentUser();
+
+        assertNotNull(current, "Expected current user to be set after successful login");
+        assertEquals("alice", current.getUsername(), "Expected the current user to be 'alice'");
+    }
+
+    @Test
+    @DisplayName("System checks for available holds and displays notifications")
+    void RESP_04_test_02() {
+        String simulatedInput = "alice\npass1\n";
+        StringWriter simulatedOutput = new StringWriter();
+
+        Scanner input = new Scanner(simulatedInput);
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        InitializeUsers init = new InitializeUsers();
+        Users users = init.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        auth.promptLogin(input, output);
+
+        String out = simulatedOutput.toString();
+        boolean hasNotification = out.contains("notification") || out.contains("No new notifications");
+        assertTrue(hasNotification, "Expected system to display notification message");
+    }
+
+    @Test
+    @DisplayName("System displays borrower operations menu")
+    void RESP_04_test_03() {
+        String simulatedInput = "alice\npass1\n";
+        StringWriter simulatedOutput = new StringWriter();
+
+        Scanner input = new Scanner(simulatedInput);
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        InitializeUsers init = new InitializeUsers();
+        Users users = init.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        auth.promptLogin(input, output);
+
+        String out = simulatedOutput.toString();
+        boolean menuDisplayed = out.contains("1. Borrow a book") &&
+                out.contains("2. Return a book") &&
+                out.contains("3. Logout");
+
+        assertTrue(menuDisplayed, "Expected borrower operations menu to be displayed");
+    }
+
+    @Test
+    @DisplayName("System checks for session ending after logout")
+    void RESP_04_test_04(){
+        String simulatedInput = "alice\npass1\n3\n";
+        StringWriter simulatedOutput = new StringWriter();
+
+        Scanner input = new Scanner(simulatedInput);
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        InitializeUsers init = new InitializeUsers();
+        Users users = init.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        auth.promptLogin(input, output);
+
+        assertNotNull(auth.getCurrentUser(), "Expected current user to be set after login");
+
+        assertNull(auth.getCurrentUser(), "Expected current user to be cleared after choosing logout");
+    }
+
+
 }
