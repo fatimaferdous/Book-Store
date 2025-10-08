@@ -90,7 +90,7 @@ public class LibraryTest {
     @Test
     @DisplayName("checks for session created")
     void RESP_04_test_01() {
-        String simulatedInput = "alice\npass1\n";
+        String simulatedInput = "CarlTY\n1234Happy\n";
         StringWriter simulatedOutput = new StringWriter();
 
         Scanner input = new Scanner(simulatedInput);
@@ -107,13 +107,13 @@ public class LibraryTest {
         Borrow current = auth.getCurrentUser();
 
         assertNotNull(current, "Expected current user to be set after successful login");
-        assertEquals("alice", current.getUsername(), "Expected the current user to be 'alice'");
+        assertEquals("CarlTY", current.getUsername(), "Expected the current user to be 'alice'");
     }
 
     @Test
     @DisplayName("System checks for available holds and displays notifications")
     void RESP_04_test_02() {
-        String simulatedInput = "alice\npass1\n";
+        String simulatedInput = "CarlTY\n1234Happy\n";
         StringWriter simulatedOutput = new StringWriter();
 
         Scanner input = new Scanner(simulatedInput);
@@ -133,7 +133,7 @@ public class LibraryTest {
     @Test
     @DisplayName("System displays borrower operations menu")
     void RESP_04_test_03() {
-        String simulatedInput = "alice\npass1\n";
+        String simulatedInput = "CarlTY\n1234Happy\n";
         StringWriter simulatedOutput = new StringWriter();
 
         Scanner input = new Scanner(simulatedInput);
@@ -156,7 +156,7 @@ public class LibraryTest {
     @Test
     @DisplayName("System checks for session ending after logout")
     void RESP_04_test_04(){
-        String simulatedInput = "alice\npass1\n3\n";
+        String simulatedInput = "CarlTY\n1234Happy\n3\n";
         StringWriter simulatedOutput = new StringWriter();
 
         Scanner input = new Scanner(simulatedInput);
@@ -167,8 +167,6 @@ public class LibraryTest {
         AuthSystem auth = new AuthSystem(users);
 
         auth.promptLogin(input, output);
-
-        assertNotNull(auth.getCurrentUser(), "Expected current user to be set after login");
 
         assertNull(auth.getCurrentUser(), "Expected current user to be cleared after choosing logout");
     }
