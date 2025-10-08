@@ -2,6 +2,11 @@ package org.example;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Scanner;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LibraryTest {
@@ -60,5 +65,25 @@ public class LibraryTest {
             if (c > maxBorrowed) maxBorrowed = c;
         }
         assertEquals(0, maxBorrowed);
+    }
+
+    @Test
+    @DisplayName("System checks for valid username and password")
+    void RESP_03_test_01(){
+        String simulatedInput = "CarlTY\n1234Happy\n";
+        StringWriter simulatedOutput = new StringWriter();
+
+        Scanner input = new Scanner(simulatedInput);
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        InitializeUsers init = new InitializeUsers();
+        Users users = init.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        auth.promptLogin(input, output);
+
+        String out = simulatedOutput.toString();
+        boolean success = out.contains("Login successful");
+        assertTrue(success, "Expected successful login message in output");
     }
 }
