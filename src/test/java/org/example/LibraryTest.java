@@ -171,5 +171,31 @@ public class LibraryTest {
         assertNull(auth.getCurrentUser(), "Expected current user to be cleared after choosing logout");
     }
 
+    @Test
+    @DisplayName("System checks for invalid credentials and prompts the user to login again")
+    void RESP_05_test_01(){
+        String simulatedInput = "wrongUser\nwrongPass\n";
+        StringWriter simulatedOutput = new StringWriter();
+
+        Scanner input = new Scanner(simulatedInput);
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        InitializeUsers init = new InitializeUsers();
+        Users users = init.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        auth.promptLogin(input, output);
+
+        String systemOutput = simulatedOutput.toString();
+
+        // Check that after invalid login, system asked for username again
+        // (We expect "Enter username:" to appear a second time for retry)
+        long usernamePrompts = systemOutput.lines()
+                .filter(line -> line.contains("Enter username:"))
+                .count();
+
+        assertTrue(usernamePrompts >= 2,
+                "Expected system to prompt for username again after invalid credentials");
+    }
 
 }
