@@ -8,12 +8,12 @@ public class Users {
     public void add(Borrow b) { borrowed.add(b); }
     Borrow get(int index) { return borrowed.get(index); }
 
-    /*public Borrow findByUsername(String username) {
+    public Borrow findByUsername(String username) {
         for (Borrow b : borrowed) {
             if (b.getUsername().equals(username)) {
                 return b;
             }
         }
         return null;
-    }*/
+    }
 }

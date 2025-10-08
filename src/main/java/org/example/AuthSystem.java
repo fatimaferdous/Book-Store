@@ -11,6 +11,17 @@ public class AuthSystem {
     }
 
     public void promptLogin(Scanner input, PrintWriter output) {
+        output.println("Enter username:");
+        String username = input.nextLine().trim();
 
+        output.println("Enter password:");
+        String password = input.nextLine().trim();
+
+        Borrow borrower = users.findByUsername(username);
+        if (borrower != null && borrower.passwordMatches(password)) {
+            output.println("Login successful. Welcome, " + username + "!");
+        } else {
+            output.println("Invalid credentials.");
+        }
     }
 }
