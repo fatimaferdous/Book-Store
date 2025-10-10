@@ -198,4 +198,72 @@ public class LibraryTest {
                 "Expected system to prompt for username again after invalid credentials");
     }
 
+    @Test
+    @DisplayName("Displays borrower's current book count")
+    void RESP_06_test_01() {
+        Borrow borrower = new Borrow("TestUser", "pass123");
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        AuthSystem auth = new AuthSystem(new Users());
+        auth.displayBorrowerBookCount(output, borrower);
+
+        String systemOutput = simulatedOutput.toString();
+
+        assertTrue(systemOutput.contains("Books currently borrowed: " + borrower.getBorrowedCount()),
+                "Expected system to display borrower's current book count");
+    }
+
+    @Test
+    @DisplayName("checks for book title, author, and status")
+    void RESP_06_test_02(){
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        AuthSystem auth = new AuthSystem(new Users());
+        auth.displayAllBooks(catalogue, output);
+
+        String systemOutput = simulatedOutput.toString();
+
+        boolean allDisplayedCorrectly = true;
+        for (int i = 0; i < catalogue.getCatalogueSize(); i++) {
+            Book book = catalogue.getBook(i);
+            String expected = book.getTitle() + " by " + book.getAuthor() + " - " + book.getStatus();
+            if (!systemOutput.contains(expected)) {
+                allDisplayedCorrectly = false;
+                break;
+            }
+        }
+        assertTrue(allDisplayedCorrectly,
+                "Expected system to display all books with title, author, and status");
+    }
+
+    @Test
+    @DisplayName("checks if Due is printed if status of book is checked out")
+    void RESP_06_test_03(){
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+
+        // Mark one book as checked out
+        Book checkedOutBook = catalogue.getBook(0);
+        checkedOutBook.setStatus(BookStatus.CHECKED_OUT);
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        AuthSystem auth = new AuthSystem(new Users());
+
+        auth.displayAllBooks(catalogue, output);
+
+        String systemOutput = simulatedOutput.toString();
+
+        assertTrue(systemOutput.contains("Due"),
+                "Expected system to display 'Due' for checked-out books");
+    }
+
+
 }

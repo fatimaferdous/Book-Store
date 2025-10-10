@@ -63,4 +63,13 @@ public class AuthSystem {
     public Borrow getCurrentUser(){
         return currentUser;
     }
+
+    void displayBorrowerBookCount(PrintWriter output, Borrow borrower) {
+
+    }
+
+    public void displayAllBooks(Catalogue catalogue, PrintWriter output) {
+
+    }
+
 }
