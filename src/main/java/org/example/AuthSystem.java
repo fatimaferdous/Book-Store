@@ -65,11 +65,21 @@ public class AuthSystem {
     }
 
     void displayBorrowerBookCount(PrintWriter output, Borrow borrower) {
-
+        output.println("Books currently borrowed: " + borrower.getBorrowedCount());
     }
 
     public void displayAllBooks(Catalogue catalogue, PrintWriter output) {
+        for (int i = 0; i < catalogue.getCatalogueSize(); i++) {
+            Book book = catalogue.getBook(i);
 
+            String info = book.getTitle() + " by " + book.getAuthor() + " - " + book.getStatus();
+
+            if (book.getStatus() == BookStatus.CHECKED_OUT) {
+                info += " (Due)";
+            }
+
+            output.println(info);
+        }
     }
 
 }
