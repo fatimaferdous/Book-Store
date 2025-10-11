@@ -111,11 +111,11 @@ public class AuthSystem {
     }
 
     public boolean canBorrow(Borrow borrower) {
-        return false;
+        return borrower.getBorrowedCount() < 3;
     }
 
     public boolean isBookAvailable(Book book) {
-        return false;
+        return book.getStatus() == BookStatus.AVAILABLE;
     }
 
 
