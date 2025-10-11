@@ -82,4 +82,21 @@ public class AuthSystem {
         }
     }
 
+    public Book borrowBook(Catalogue catalogue, Scanner input, PrintWriter output) {
+        output.println("Select a book to borrow (1-" + catalogue.getCatalogueSize() + "):");
+        int choice = Integer.parseInt(input.nextLine()) - 1;
+
+        Book book = catalogue.getBook(choice);
+
+
+
+        return book;
+    }
+
+    public void confirmBorrowing(Book selectedBook, Scanner input, PrintWriter output) {
+
+    }
+
+
+
 }

@@ -265,5 +265,52 @@ public class LibraryTest {
                 "Expected system to display 'Due' for checked-out books");
     }
 
+    @Test
+    @DisplayName("Checks if borrower selects a book and the system is able to display book borrowing info")
+    void RESP_07_test_01(){
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+
+        Book selectedBook = catalogue.getBook(0);
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+        Scanner simulatedInput = new Scanner("1\n"); // borrower selects book #1
+
+        AuthSystem auth = new AuthSystem(new Users());
+
+        auth.borrowBook(catalogue, simulatedInput, output);
+
+        String systemOutput = simulatedOutput.toString();
+
+        boolean confirmationDisplayed = systemOutput.contains("You selected: " + selectedBook.getTitle()) &&
+                systemOutput.contains("Author: " + selectedBook.getAuthor());
+
+        assertTrue(confirmationDisplayed,
+                "Expected system to show selected book details and confirmation prompt");
+    }
+
+    @Test
+    @DisplayName("borrower confirms the borrowing transaction")
+    void RESP_07_test_02(){
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        Scanner simulatedInput = new Scanner("1\nY\n"); // select book 1, confirm
+
+        AuthSystem auth = new AuthSystem(new Users());
+
+        Book selectedBook = auth.borrowBook(catalogue, simulatedInput, output);
+
+        auth.confirmBorrowing(selectedBook, simulatedInput, output);
+
+        String systemOutput = simulatedOutput.toString();
+
+        assertTrue(systemOutput.contains("Book borrowed successfully."),
+                "Expected system to confirm the borrowing transaction");
+    }
 
 }
