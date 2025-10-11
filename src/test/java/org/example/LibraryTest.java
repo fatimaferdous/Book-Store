@@ -309,7 +309,7 @@ public class LibraryTest {
 
         String systemOutput = simulatedOutput.toString();
 
-        assertTrue(systemOutput.contains("Book borrowed successfully."),
+        assertTrue(systemOutput.contains("You want to confirm borrowing"),
                 "Expected system to confirm the borrowing transaction");
     }
 

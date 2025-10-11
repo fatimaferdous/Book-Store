@@ -104,7 +104,7 @@ public class AuthSystem {
         String confirmation = input.nextLine().trim();
 
         if (confirmation.equalsIgnoreCase("Y")) {
-            output.println("Book borrowed successfully.");
+            output.println("You want to confirm borrowing");
         } else {
             output.println("Borrowing cancelled.");
         }
