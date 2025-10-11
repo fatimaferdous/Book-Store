@@ -110,6 +110,14 @@ public class AuthSystem {
         }
     }
 
+    public boolean canBorrow(Borrow borrower) {
+        return false;
+    }
+
+    public boolean isBookAvailable(Book book) {
+        return false;
+    }
+
 
 
 }

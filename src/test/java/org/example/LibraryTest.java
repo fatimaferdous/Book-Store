@@ -313,4 +313,33 @@ public class LibraryTest {
                 "Expected system to confirm the borrowing transaction");
     }
 
+    @Test
+    @DisplayName("Verifies book availability")
+    void RESP_08_test_01() {
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+
+        AuthSystem auth = new AuthSystem(new Users());
+
+        Book selectedBook = catalogue.getBook(0);
+
+        boolean isAvailable = auth.isBookAvailable(selectedBook);
+
+        assertTrue(isAvailable, "Expected system to verify that the selected book is available");
+    }
+
+    @Test
+    @DisplayName("Checks if borrower has < 3 books")
+    void RESP_08_test_02(){
+        Borrow borrower = new Borrow("TestUser", "pass123");
+        borrower.borrowCount = 2;
+
+        AuthSystem auth = new AuthSystem(new Users());
+
+        boolean eligible = auth.canBorrow(borrower);
+
+        assertTrue(eligible, "Expected borrower to be eligible to borrow a book when they have fewer than 3 books");
+    }
+
+
 }
