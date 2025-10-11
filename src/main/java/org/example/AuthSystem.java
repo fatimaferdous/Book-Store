@@ -87,15 +87,19 @@ public class AuthSystem {
         int choice = Integer.parseInt(input.nextLine()) - 1;
 
         Book book = catalogue.getBook(choice);
+        if (book.getStatus() == BookStatus.AVAILABLE) {
+            output.println("You selected: " + book.getTitle());
+            output.println("Author: " + book.getAuthor());
 
-        output.println("You selected: " + book.getTitle());
-        output.println("Author: " + book.getAuthor());
-
-        return book;
+            return book;
+        } else {
+            output.println("Sorry, that book is not available.");
+            return null;
+        }
     }
 
     public void confirmBorrowing(Book selectedBook, Scanner input, PrintWriter output) {
-
+        if (selectedBook == null) return;
         output.println("Confirm borrowing? (Y/N)");
         String confirmation = input.nextLine().trim();
 
