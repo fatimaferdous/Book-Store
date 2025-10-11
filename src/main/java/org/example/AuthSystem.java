@@ -88,13 +88,22 @@ public class AuthSystem {
 
         Book book = catalogue.getBook(choice);
 
-
+        output.println("You selected: " + book.getTitle());
+        output.println("Author: " + book.getAuthor());
 
         return book;
     }
 
     public void confirmBorrowing(Book selectedBook, Scanner input, PrintWriter output) {
 
+        output.println("Confirm borrowing? (Y/N)");
+        String confirmation = input.nextLine().trim();
+
+        if (confirmation.equalsIgnoreCase("Y")) {
+            output.println("Book borrowed successfully.");
+        } else {
+            output.println("Borrowing cancelled.");
+        }
     }
 
 
