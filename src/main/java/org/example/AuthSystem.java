@@ -120,15 +120,23 @@ public class AuthSystem {
     }
 
     public LocalDate calculateDueDate() {
-        return LocalDate.now();
+        return LocalDate.now().plusDays(14);
     }
 
     public void recordBorrowTransaction(Borrow borrower, Book book, LocalDate dueDate) {
-
+        borrower.addBorrowedBook(book, dueDate);
     }
 
     public void updateAccountStatus(Borrow borrower, Book book) {
+        if (borrower != null && book != null) {
+            if (!borrower.getBorrowedBooks().contains(book)) {
+                borrower.addBorrowedBook(book, calculateDueDate());
+            }
 
+
+            borrower.incrementBorrowCount();
+            book.setStatus(BookStatus.CHECKED_OUT);
+        }
     }
 
 }
