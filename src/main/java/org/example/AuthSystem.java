@@ -140,7 +140,13 @@ public class AuthSystem {
     }
 
     public void finalConfirmation(Borrow borrower, Book book, LocalDate dueDate, Scanner input, PrintWriter output) {
+        output.println("Borrowing confirmed for " + borrower.getUsername() + "!");
+        output.println("Book: " + book.getTitle());
+        output.println("Due date: " + dueDate);
 
+        output.println("Press Enter to continue...");
+        input.nextLine();
+        displayMenu(output);
     }
 
 }
