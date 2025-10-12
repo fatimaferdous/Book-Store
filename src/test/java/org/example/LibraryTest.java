@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDate;
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -341,5 +342,69 @@ public class LibraryTest {
         assertTrue(eligible, "Expected borrower to be eligible to borrow a book when they have fewer than 3 books");
     }
 
+    @Test
+    @DisplayName("System calculates due date 14 days from now")
+    void RESP_09_test_01(){
+        AuthSystem auth = new AuthSystem(new Users());
+
+        LocalDate dueDate = auth.calculateDueDate();
+
+        LocalDate expectedDate = LocalDate.now().plusDays(14);
+        assertEquals(expectedDate, dueDate);
+    }
+
+    @Test
+    @DisplayName("checks for recorded borrowing transaction")
+    void RESP_09_test_02(){
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+        LocalDate dueDate = auth.calculateDueDate();
+
+        auth.recordBorrowTransaction(borrower, book, dueDate);
+
+        assertTrue(borrower.getBorrowedBooks().contains(book));
+    }
+
+    @Test
+    @DisplayName("System checks for book status checked out after borrower account was updated")
+    void RESP_09_test_03(){
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+
+        AuthSystem auth = new AuthSystem(users);
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+        LocalDate dueDate = auth.calculateDueDate();
+
+        auth.recordBorrowTransaction(borrower, book, dueDate);
+        auth.updateAccountStatus(borrower, book);
+
+        assertEquals(BookStatus.CHECKED_OUT, book.getStatus());
+    }
+
+    @Test
+    @DisplayName("System checks for borrower account gets incremented with number of books after updating")
+    void RESP_09_test_04(){
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+
+        AuthSystem auth = new AuthSystem(users);
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+
+        auth.updateAccountStatus(borrower, book);
+
+        assertEquals(1, borrower.getBorrowedCount());
+    }
 
 }

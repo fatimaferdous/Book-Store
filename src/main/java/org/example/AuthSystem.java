@@ -1,6 +1,7 @@
 package org.example;
 
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.Scanner;
 
 public class AuthSystem {
@@ -118,6 +119,16 @@ public class AuthSystem {
         return book.getStatus() == BookStatus.AVAILABLE;
     }
 
+    public LocalDate calculateDueDate() {
+        return LocalDate.now();
+    }
 
+    public void recordBorrowTransaction(Borrow borrower, Book book, LocalDate dueDate) {
+
+    }
+
+    public void updateAccountStatus(Borrow borrower, Book book) {
+
+    }
 
 }
