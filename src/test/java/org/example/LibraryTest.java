@@ -407,4 +407,52 @@ public class LibraryTest {
         assertEquals(1, borrower.getBorrowedCount());
     }
 
+    @Test
+    @DisplayName("checks for final confirmation and acknowledgment")
+    void RESP_10_test_01(){
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+        LocalDate dueDate = auth.calculateDueDate();
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+        Scanner simulatedInput = new Scanner("\n"); // borrower acknowledges by pressing Enter
+
+        auth.finalConfirmation(borrower, book, dueDate, simulatedInput, output);
+
+        String systemOutput = simulatedOutput.toString();
+
+        assertTrue(systemOutput.contains(book.getTitle()) && systemOutput.contains("Press Enter to continue"));
+    }
+
+    @Test
+    @DisplayName("checks for system returning to menu after user acknowledgement")
+    void RESP_10_test_02(){
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+        LocalDate dueDate = auth.calculateDueDate();
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+        Scanner simulatedInput = new Scanner("\n");
+
+        auth.finalConfirmation(borrower, book, dueDate, simulatedInput, output);
+
+        String systemOutput = simulatedOutput.toString();
+
+        assertTrue(systemOutput.contains("Available operations:"));
+    }
+
 }
