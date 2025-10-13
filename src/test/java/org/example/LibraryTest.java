@@ -645,4 +645,67 @@ public class LibraryTest {
                 result.contains("Available operations:"));
     }
 
+    @Test
+    @DisplayName("Borrower checks to select a book to return")
+    void RESP_16_test_01() {
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+
+        borrower.addBorrowedBook(book, auth.calculateDueDate());
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+        Scanner simulatedInput = new Scanner("1\n");
+
+        Book selectedBook = auth.selectReturnBook(borrower, simulatedInput, output);
+
+        assertTrue(selectedBook == book && simulatedOutput.toString().contains("Select a book to return"));
+    }
+
+    @Test
+    @DisplayName("System checks for pending holds on returned book")
+    void RESP_16_test_02() {
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+        borrower.addBorrowedBook(book, auth.calculateDueDate());
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        boolean hasHold = auth.checkPendingHolds(book, output);
+
+        assertTrue(!hasHold && simulatedOutput.toString().contains("Checking for pending holds"));
+    }
+
+    @Test
+    @DisplayName("Updates book status and removes from borrower's account")
+    void RESP_16_test_03() {
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+        auth.updateAccountStatus(borrower, book);
+
+        auth.holdUpdate(borrower, book);
+
+        assertTrue(borrower.getBorrowedBooks().isEmpty() && book.getStatus() == BookStatus.AVAILABLE);
+    }
+
+
 }

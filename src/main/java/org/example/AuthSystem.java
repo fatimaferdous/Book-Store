@@ -216,5 +216,19 @@ public class AuthSystem {
         return borrowed;
     }
 
+    public Book selectReturnBook(Borrow borrower, Scanner input, PrintWriter output) {
+        List<Book> borrowed = displayBorrowedBooks(borrower, output);
+
+        return borrowed.get(0);
+    }
+
+    public boolean checkPendingHolds(Book book, PrintWriter output) {
+        return false;
+    }
+
+    public void holdUpdate(Borrow borrower, Book book) {
+
+    }
+
 
 }
