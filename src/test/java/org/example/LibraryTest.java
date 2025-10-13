@@ -628,4 +628,21 @@ public class LibraryTest {
         assertTrue(systemOutput.contains(book.getTitle()) && systemOutput.contains(expectedDueDate.toString()));
     }
 
+    @Test
+    @DisplayName("System check borrower has no books and displays menu")
+    void RESP_15_test_01(){
+        Borrow borrower = new Borrow("TestUser", "pass123");
+        AuthSystem auth = new AuthSystem(new Users());
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput);
+
+        auth.displayBorrowedBooks(borrower, output);
+        output.flush();
+
+        String result = simulatedOutput.toString();
+
+        assertTrue(result.contains("No books currently borrowed.") &&
+                result.contains("Available operations:"));
+    }
+
 }
