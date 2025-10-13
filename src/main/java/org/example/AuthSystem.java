@@ -2,6 +2,7 @@ package org.example;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Scanner;
 
 public class AuthSystem {
@@ -200,6 +201,9 @@ public class AuthSystem {
         }
     }
 
+    public void displayBorrowedBooks(Borrow borrower, PrintWriter output) {
+
+    }
 
 
 }

@@ -604,4 +604,28 @@ public class LibraryTest {
         assertTrue(systemOutput.contains("Maximum borrowing limit reached"));
     }
 
+    @Test
+    @DisplayName("System checks for displayed borrowed books with due dates")
+    void RESP_14_test_01(){
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+
+        borrower.addBorrowedBook(book, auth.calculateDueDate());
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        auth.displayBorrowedBooks(borrower, output);
+
+        String systemOutput = simulatedOutput.toString();
+        LocalDate expectedDueDate = LocalDate.now().plusDays(14);
+        assertTrue(systemOutput.contains(book.getTitle()) && systemOutput.contains(expectedDueDate.toString()));
+    }
+
 }
