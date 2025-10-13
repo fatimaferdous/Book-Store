@@ -194,7 +194,10 @@ public class AuthSystem {
     }
 
     public void borrowMax(Borrow borrower, PrintWriter output) {
-
+        if (borrower.getBorrowedCount() >= 3) {
+            output.println("Maximum borrowing limit reached");
+            displayMenu(output);
+        }
     }
 
 
