@@ -11,6 +11,7 @@ public class Borrow {
     String password;
     int borrowCount = 0;
     Map<Book, LocalDate> borrowedBooks = new HashMap<>();
+    List<Book> holds = new ArrayList<>();//THIS
     int getBorrowedCount() { return borrowCount; }
 
     public void incrementBorrowCount() {
@@ -32,4 +33,12 @@ public class Borrow {
     public List<Book> getBorrowedBooks() {
         return new ArrayList<>(borrowedBooks.keySet());
     }
+
+    public void addHold(Book book) {
+        if (!holds.contains(book)) {
+            holds.add(book);
+        }
+    }
+
+    public List<Book> getHolds() {return new ArrayList<>(holds);}
 }

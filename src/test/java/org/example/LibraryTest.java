@@ -455,4 +455,80 @@ public class LibraryTest {
         assertTrue(systemOutput.contains("Available operations:"));
     }
 
+    @Test
+    @DisplayName("System offers a hold if the book is checked out or on hold by someone else")
+    void RESP_11_test_01(){
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+
+        book.setStatus(BookStatus.CHECKED_OUT);
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+        boolean canPlaceHold = auth.unavailableBook(borrower, catalogue, book, output);
+
+        String systemOutput = simulatedOutput.toString();
+        assertTrue(systemOutput.contains("Book is unavailable. Would you like to place a hold?") && canPlaceHold);
+    }
+
+    @Test
+    @DisplayName("Borrower already has a hold on this book")
+    void RESP_11_test_02() {
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+
+        borrower.addHold(book);
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        boolean canPlaceHold = auth.unavailableBook(borrower, catalogue, book, output);
+
+        String systemOutput = simulatedOutput.toString();
+
+        assertTrue(
+                systemOutput.contains("You already have a hold on this book") && !canPlaceHold,
+                "Expected message about existing hold and return to Step 2");
+    }
+
+    @Test
+    @DisplayName("Borrower already has this book checked out, no hold allowed")
+    void RESP_11_test_03() {
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+
+        borrower.addBorrowedBook(book, auth.calculateDueDate());
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        boolean canPlaceHold = auth.unavailableBook(borrower, catalogue, book, output);
+
+        String systemOutput = simulatedOutput.toString();
+
+        assertTrue(
+                systemOutput.contains("You already have this book checked out") && !canPlaceHold,
+                "Expected system to detect that borrower already has this book checked out and return to Step 2");
+    }
+
+
+
 }

@@ -149,4 +149,9 @@ public class AuthSystem {
         displayMenu(output);
     }
 
+    public boolean unavailableBook(Borrow borrower, Catalogue catalogue, Book book, PrintWriter output) {
+        return false;
+    }
+
+
 }
