@@ -150,7 +150,31 @@ public class AuthSystem {
     }
 
     public boolean unavailableBook(Borrow borrower, Catalogue catalogue, Book book, PrintWriter output) {
-        return false;
+        // If borrower already has the book checked out
+        if (borrower.getBorrowedBooks().contains(book)) {
+            output.println("You already have this book checked out");
+            displayAllBooks(catalogue, output); // return to Step 2
+            return false;
+        }
+
+
+        // If borrower already has a hold on the book
+        if (borrower.getHolds().contains(book)) {
+            output.println("You already have a hold on this book");
+            displayAllBooks(catalogue, output); // return to Step 2
+            return false;
+        }
+
+
+        // If book is unavailable for others
+        if (book.getStatus() == BookStatus.CHECKED_OUT || book.getStatus() == BookStatus.ON_HOLD) {
+            output.println("Book is unavailable. Would you like to place a hold?");
+            return true;
+        }
+
+
+        return false; // book is available, no hold needed
+
     }
 
 
