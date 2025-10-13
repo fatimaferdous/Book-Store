@@ -202,7 +202,16 @@ public class AuthSystem {
     }
 
     public void displayBorrowedBooks(Borrow borrower, PrintWriter output) {
+        List<Book> borrowed = borrower.getBorrowedBooks();
+        if (borrowed.isEmpty()) {
+            output.println("No books currently borrowed.");
+            return;
+        }
 
+        for (Book book : borrowed) {
+            LocalDate dueDate = calculateDueDate();
+            output.println(book.getTitle() + " - Due: " + dueDate);
+        }
     }
 
 
