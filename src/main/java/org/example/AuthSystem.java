@@ -177,5 +177,11 @@ public class AuthSystem {
 
     }
 
+    public void offerHold(Borrow borrower, Book book, Catalogue catalogue, Scanner input, PrintWriter output) {
+
+    }
+
+
+
 
 }

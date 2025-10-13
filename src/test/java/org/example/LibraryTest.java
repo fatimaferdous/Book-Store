@@ -529,6 +529,63 @@ public class LibraryTest {
                 "Expected system to detect that borrower already has this book checked out and return to Step 2");
     }
 
+    @Test
+    @DisplayName("Borrower at 3-book limit and system offers hold")
+    void RESP_12_test_01() {
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+        book.setStatus(BookStatus.AVAILABLE);
+
+        borrower.incrementBorrowCount();
+        borrower.incrementBorrowCount();
+        borrower.incrementBorrowCount();
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        Scanner simulatedInput = new Scanner("N\n");
+
+        auth.offerHold(borrower, book, catalogue, simulatedInput, output);
+
+        String systemOutput = simulatedOutput.toString();
+
+        assertTrue(systemOutput.contains("You have reached the max borrow limit. Would you like to place a hold on the book? (Y/N)"));
+    }
+
+    @Test
+    @DisplayName("RESP_12_test_02 - Borrower confirms hold placement")
+    void RESP_12_test_02() {
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+        book.setStatus(BookStatus.AVAILABLE);
+
+        // Borrower already has 3 books
+        borrower.incrementBorrowCount();
+        borrower.incrementBorrowCount();
+        borrower.incrementBorrowCount();
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        Scanner simulatedInput = new Scanner("Y\n");
+
+        auth.offerHold(borrower, book, catalogue, simulatedInput, output);
+
+        assertTrue(book.getHoldQueue().contains(borrower));
+    }
+
 
 
 }
