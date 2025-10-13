@@ -219,15 +219,39 @@ public class AuthSystem {
     public Book selectReturnBook(Borrow borrower, Scanner input, PrintWriter output) {
         List<Book> borrowed = displayBorrowedBooks(borrower, output);
 
-        return borrowed.get(0);
+        if (borrowed.isEmpty()) {
+            return null;
+        }
+
+        output.println("Select a book to return:");
+        for (int i = 0; i < borrowed.size(); i++) {
+            output.println((i + 1) + ". " + borrowed.get(i).getTitle());
+        }
+
+        int choice = Integer.parseInt(input.nextLine()) - 1;
+        if (choice >= 0 && choice < borrowed.size()) {
+            return borrowed.get(choice);
+        }
+
+        return null;
     }
 
     public boolean checkPendingHolds(Book book, PrintWriter output) {
-        return false;
+        output.println("Checking for pending holds...");
+        return !book.getHoldQueue().isEmpty();
     }
 
     public void holdUpdate(Borrow borrower, Book book) {
+        if (book == null) return;
 
+        if (book.getHoldQueue().isEmpty()) {
+            book.setStatus(BookStatus.AVAILABLE);
+        } else {
+            book.setStatus(BookStatus.ON_HOLD);
+        }
+
+        borrower.borrowedBooks.remove(book);
+        borrower.borrowCount = borrower.getBorrowedBooks().size();
     }
 
 
