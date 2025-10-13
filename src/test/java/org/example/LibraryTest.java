@@ -586,6 +586,22 @@ public class LibraryTest {
         assertTrue(book.getHoldQueue().contains(borrower));
     }
 
+    @Test
+    @DisplayName("The system notifies borrower maximum borrowing limit reached")
+    void RESP_13_test_01(){
+        Borrow borrower = new Borrow("TestUser", "pass123");
+        borrower.borrowCount = 3; // already at max limit
 
+        AuthSystem auth = new AuthSystem(new Users());
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        auth.borrowMax(borrower, output);
+
+        String systemOutput = simulatedOutput.toString();
+
+        assertTrue(systemOutput.contains("Maximum borrowing limit reached"));
+    }
 
 }

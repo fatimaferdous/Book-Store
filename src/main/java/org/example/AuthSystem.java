@@ -193,6 +193,9 @@ public class AuthSystem {
         }
     }
 
+    public void borrowMax(Borrow borrower, PrintWriter output) {
+
+    }
 
 
 
