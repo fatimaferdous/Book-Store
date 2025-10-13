@@ -707,5 +707,30 @@ public class LibraryTest {
         assertTrue(borrower.getBorrowedBooks().isEmpty() && book.getStatus() == BookStatus.AVAILABLE);
     }
 
+    @Test
+    @DisplayName("Confirms book return with borrower acknowledges and returns to menu")
+    void RESP_17_test_01() {
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        Borrow borrower = users.findByUsername("CarlTY");
+        Book book = catalogue.getBook(0);
+        LocalDate dueDate = auth.calculateDueDate();
+        borrower.addBorrowedBook(book, dueDate);
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+        Scanner simulatedInput = new Scanner("1\n\n");
+
+        Book selectedBook = auth.selectReturnBook(borrower, simulatedInput, output);
+        auth.holdUpdate(borrower, selectedBook);
+        auth.returnConfirmation(selectedBook, simulatedInput, output);
+
+        String systemOutput = simulatedOutput.toString();
+        assertTrue(systemOutput.contains("Return confirmed for " + book.getTitle()) && systemOutput.contains("Available operations:"));
+    }
 
 }

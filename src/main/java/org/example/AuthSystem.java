@@ -254,5 +254,8 @@ public class AuthSystem {
         borrower.borrowCount = borrower.getBorrowedBooks().size();
     }
 
+    public void returnConfirmation(Book book, Scanner input, PrintWriter output) {
+
+    }
 
 }
