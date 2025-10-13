@@ -178,7 +178,19 @@ public class AuthSystem {
     }
 
     public void offerHold(Borrow borrower, Book book, Catalogue catalogue, Scanner input, PrintWriter output) {
+        if (borrower.getBorrowedCount() == 3 && book.getStatus() == BookStatus.AVAILABLE) {
+            output.println("You have reached the max borrow limit. Would you like to place a hold on the book? (Y/N)");
 
+            String choice = input.nextLine().trim();
+            if (choice.equalsIgnoreCase("Y")) {
+                book.addHold(borrower);
+                output.println("Hold successfully placed for book: " + book.getTitle());
+            } else {
+                output.println("Hold not placed.");
+            }
+
+            displayAllBooks(catalogue, output);
+        }
     }
 
 
