@@ -205,6 +205,7 @@ public class AuthSystem {
         List<Book> borrowed = borrower.getBorrowedBooks();
         if (borrowed.isEmpty()) {
             output.println("No books currently borrowed.");
+            displayMenu(output);
             return;
         }
 
