@@ -255,7 +255,12 @@ public class AuthSystem {
     }
 
     public void returnConfirmation(Book book, Scanner input, PrintWriter output) {
+        output.println("Return confirmed for " + book.getTitle());
 
+        output.println("Press Enter to continue...");
+        input.nextLine();
+
+        displayMenu(output);
     }
 
 }
