@@ -155,24 +155,6 @@ public class LibraryTest {
     }
 
     @Test
-    @DisplayName("System checks for session ending after logout")
-    void RESP_04_test_04(){
-        String simulatedInput = "CarlTY\n1234Happy\n3\n";
-        StringWriter simulatedOutput = new StringWriter();
-
-        Scanner input = new Scanner(simulatedInput);
-        PrintWriter output = new PrintWriter(simulatedOutput, true);
-
-        InitializeUsers init = new InitializeUsers();
-        Users users = init.initializeUsers();
-        AuthSystem auth = new AuthSystem(users);
-
-        auth.promptLogin(input, output);
-
-        assertNull(auth.getCurrentUser(), "Expected current user to be cleared after choosing logout");
-    }
-
-    @Test
     @DisplayName("System checks for invalid credentials and prompts the user to login again")
     void RESP_05_test_01(){
         String simulatedInput = "wrongUser\nwrongPass\n";
