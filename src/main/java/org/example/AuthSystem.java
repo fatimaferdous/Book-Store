@@ -42,7 +42,18 @@ public class AuthSystem {
     }
 
     public void checkNotifications(Borrow borrower, PrintWriter output) {
-        output.println("No new notifications.");
+        List<Book> heldBooks = borrower.getHolds();
+        if (heldBooks.isEmpty()) {
+            output.println("No new notifications.");
+            return;
+        }
+
+        for (Book book : heldBooks) {
+            if (book.getStatus() == BookStatus.ON_HOLD &&
+                    book.getHoldQueue().peek() == borrower) {
+                output.println("Notification: Book '" + book.getTitle() + "' is now available for you to borrow.");
+            }
+        }
     }
 
     void displayMenu(PrintWriter output) {
@@ -238,6 +249,10 @@ public class AuthSystem {
             book.setStatus(BookStatus.AVAILABLE);
         } else {
             book.setStatus(BookStatus.ON_HOLD);
+            Borrow nextBorrower = book.getHoldQueue().peek();
+            if (nextBorrower != null && !nextBorrower.getHolds().contains(book)) {
+                nextBorrower.addHold(book);
+            }
         }
 
         borrower.borrowedBooks.remove(book);
