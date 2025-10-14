@@ -765,5 +765,25 @@ public class LibraryTest {
         assertTrue(systemOutput.contains("Notification: Book 'Test Book' is now available for you to borrow."));
     }
 
+    @Test
+    @DisplayName("Checks for user logout and back to authentication")
+    void RESP_19_test_01(){
+        Users users = new Users();
+        Borrow borrower = new Borrow("CarlTY", "1234Happy");
+        users.add(borrower);
+
+        AuthSystem auth = new AuthSystem(users);
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+        Scanner simulatedInput = new Scanner("\n");
+
+        auth.logout(simulatedInput, output);
+
+        String systemOutput = simulatedOutput.toString();
+
+        assertTrue(systemOutput.contains("You have successfully logged out.") && auth.getCurrentUser() == null && systemOutput.contains("Please login with your username and password"));
+    }
+
 
 }

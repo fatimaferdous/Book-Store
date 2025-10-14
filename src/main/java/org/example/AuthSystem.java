@@ -268,4 +268,9 @@ public class AuthSystem {
         displayMenu(output);
     }
 
+    public void logout(Scanner input, PrintWriter output) {
+
+    }
+
+
 }
