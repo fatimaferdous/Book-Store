@@ -269,7 +269,11 @@ public class AuthSystem {
     }
 
     public void logout(Scanner input, PrintWriter output) {
+        output.println("You have successfully logged out.");
+        currentUser = null;
 
+        output.println("Please login with your username and password");
+        promptLogin(input, output);
     }
 
 
