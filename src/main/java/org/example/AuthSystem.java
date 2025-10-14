@@ -33,12 +33,6 @@ public class AuthSystem {
 
                 displayMenu(output);
 
-                String choice = input.hasNextLine() ? input.nextLine().trim() : "";
-                if (choice.equals("3")) {
-                    logout(output);
-                    break;
-                }
-
             } else {
                 output.println("Invalid credentials.");
             }
@@ -55,11 +49,6 @@ public class AuthSystem {
         output.println("1. Borrow a book");
         output.println("2. Return a book");
         output.println("3. Logout");
-    }
-
-    void logout(PrintWriter output) {
-        output.println("Logging out...");
-        currentUser = null;
     }
 
     public Borrow getCurrentUser(){
