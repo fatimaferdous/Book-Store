@@ -32,6 +32,7 @@ public class AuthSystem {
                 checkNotifications(output);
 
                 displayMenu(output);
+                break;
 
             } else {
                 output.println("Invalid credentials.");
