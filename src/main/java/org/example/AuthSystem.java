@@ -29,7 +29,7 @@ public class AuthSystem {
                 currentUser = borrower;
                 output.println("Login successful. Welcome, " + username + "!");
 
-                checkNotifications(output);
+                checkNotifications(borrower, output);
 
                 displayMenu(output);
                 break;
@@ -41,7 +41,7 @@ public class AuthSystem {
         }
     }
 
-    void checkNotifications(PrintWriter output) {
+    public void checkNotifications(Borrow borrower, PrintWriter output) {
         output.println("No new notifications.");
     }
 

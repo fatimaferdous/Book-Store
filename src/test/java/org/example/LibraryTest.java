@@ -715,4 +715,55 @@ public class LibraryTest {
         assertTrue(systemOutput.contains("Return confirmed for " + book.getTitle()) && systemOutput.contains("Available operations:"));
     }
 
+    @Test
+    @DisplayName("checks if book set to on hold and reserved for next borrower in queue")
+    void RESP_18_test_01() {
+        Borrow originalBorrower = new Borrow("Emily", "pass123");
+        Borrow nextBorrower = new Borrow("Caren", "pass456");
+
+        Book book = new Book("Test Book", "Author Name");
+        book.setStatus(BookStatus.CHECKED_OUT);
+        book.addHold(nextBorrower); // Bob is next in line for this book
+
+        originalBorrower.addBorrowedBook(book, LocalDate.now().plusDays(7));
+        originalBorrower.incrementBorrowCount();
+
+        AuthSystem auth = new AuthSystem(new Users());
+
+        auth.holdUpdate(originalBorrower, book); // Alice returns it
+
+        assertTrue(book.getStatus() == BookStatus.ON_HOLD && book.getHoldQueue().peek() == nextBorrower && nextBorrower.getHolds().contains(book) && !originalBorrower.getBorrowedBooks().contains(book));
+    }
+
+    @Test
+    @DisplayName("System checks if borrower is notified on next login when a held book becomes available")
+    void RESP_18_test_02() {
+        Borrow originalBorrower = new Borrow("Alice", "pass123");
+        Borrow nextBorrower = new Borrow("Bob", "pass456");
+
+        Book book = new Book("Test Book", "Author Name");
+        book.setStatus(BookStatus.CHECKED_OUT);
+        book.addHold(nextBorrower); // Bob is next in line for this book
+
+        originalBorrower.addBorrowedBook(book, LocalDate.now().plusDays(7));
+        originalBorrower.incrementBorrowCount();
+
+        // Add the book to the hold list of Bob
+        nextBorrower.addHold(book);
+
+        AuthSystem auth = new AuthSystem(new Users());
+
+        auth.holdUpdate(originalBorrower, book); // Alice returns it
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        auth.checkNotifications(nextBorrower, output); // Bob logs in
+
+        String systemOutput = simulatedOutput.toString();
+
+        assertTrue(systemOutput.contains("Notification: Book 'Test Book' is now available for you to borrow."));
+    }
+
+
 }
