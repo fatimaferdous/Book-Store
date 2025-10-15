@@ -785,5 +785,56 @@ public class LibraryTest {
         assertTrue(systemOutput.contains("You have successfully logged out.") && auth.getCurrentUser() == null && systemOutput.contains("Please login with your username and password"));
     }
 
+    @Test
+    @DisplayName("Acceptance test 1")
+    void A_test_01() {
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
+        AuthSystem auth = new AuthSystem(users);
+
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        //user1 logs in and borrows Great Gatsby
+        Scanner input1 = new Scanner("CarlTY\n1234Happy\n1\n1\nY\n"); // login, borrow menu, select book 1, confirm
+        auth.promptLogin(input1, output);
+
+        Borrow user1 = auth.getCurrentUser();
+        Book gatsby = catalogue.getBook(0);
+        auth.updateAccountStatus(user1, gatsby);
+        auth.finalConfirmation(user1, gatsby, auth.calculateDueDate(), input1, output);
+        auth.logout(input1, output);
+
+        // Assert book is checked out
+        assertEquals(BookStatus.CHECKED_OUT, gatsby.getStatus(), "Book should be checked out after borrowing");
+        assertTrue(user1.getBorrowedBooks().contains(gatsby), "User1 should have the book in their account");
+
+        //user2 logs in and sees the book checked out
+        Scanner input2 = new Scanner("Unix\nteyrhupf\n3\n"); // login and logout immediately
+        auth.promptLogin(input2, output);
+
+        assertEquals(BookStatus.CHECKED_OUT, gatsby.getStatus(), "Book should still be checked out for User2");
+        auth.logout(input2, output);
+
+        // user1 logs back in and returns the book
+        Scanner input3 = new Scanner("CarlTY\n1234Happy\n2\n1\n\n3\n"); // login, return menu 2, select book 1, press Enter, logout
+        auth.promptLogin(input3, output);
+
+        auth.holdUpdate(user1, gatsby);
+        auth.returnConfirmation(gatsby, input3, output);
+        auth.logout(input3, output);
+
+        // user2 logs in and sees book available
+        Scanner input4 = new Scanner("Unix\nteyrhupf\n3\n");
+        auth.promptLogin(input4, output);
+
+        assertEquals(BookStatus.AVAILABLE, gatsby.getStatus(), "Book should be available after return");
+        auth.logout(input4, output);
+    }
+
+
 
 }
