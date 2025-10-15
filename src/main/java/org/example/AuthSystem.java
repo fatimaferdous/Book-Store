@@ -78,7 +78,8 @@ public class AuthSystem {
             String info = book.getTitle() + " by " + book.getAuthor() + " - " + book.getStatus();
 
             if (book.getStatus() == BookStatus.CHECKED_OUT) {
-                info += " (Due)";
+                LocalDate dueDate = calculateDueDate();
+                info += " (Due: " + dueDate + ")";
             }
 
             output.println(info);
