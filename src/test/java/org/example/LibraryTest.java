@@ -835,6 +835,46 @@ public class LibraryTest {
         auth.logout(input4, output);
     }
 
+    @Test
+    @DisplayName("Acceptance test 2")
+    void A_test_02(){
+        InitializeUsers initUsers = new InitializeUsers();
+        Users users = initUsers.initializeUsers();
 
+        InitializeLibrary initLib = new InitializeLibrary();
+        Catalogue catalogue = initLib.initializeLibrary();
+
+        AuthSystem auth = new AuthSystem(users);
+
+        StringWriter simulatedOutput = new StringWriter();
+        PrintWriter output = new PrintWriter(simulatedOutput, true);
+
+        assertEquals(3, users.size(), "There should be 3 borrower accounts initialized");
+        assertEquals(20, catalogue.getCatalogueSize(), "There should be 20 books initialized");
+
+        Scanner input1 = new Scanner("CarlTY\n1234Happy\n3\n");
+        auth.promptLogin(input1, output);
+
+        Borrow current = auth.getCurrentUser();
+        assertNotNull(current, "User should be logged in successfully");
+        assertEquals("CarlTY", current.getUsername(), "Logged in user should be CarlTY");
+
+        String out1 = simulatedOutput.toString();
+        assertTrue(out1.contains("Login successful. Welcome, CarlTY!"), "Should confirm successful login");
+        assertTrue(out1.contains("Available operations:"), "Should display menu options");
+
+        auth.logout(input1, output);
+        assertNull(auth.getCurrentUser(), "After logout, no user should remain logged in");
+
+        String out2 = simulatedOutput.toString();
+        assertTrue(out2.contains("You have successfully logged out."), "Should confirm logout");
+
+        Scanner input2 = new Scanner("WrongUser\nBadPass\nUnix\nteyrhupf\n3\n");
+        auth.promptLogin(input2, output);
+
+        String out3 = simulatedOutput.toString();
+        assertTrue(out3.contains("Invalid credentials."), "System should reject invalid login attempt");
+        assertTrue(out3.contains("Login successful. Welcome, Unix!"), "System should allow valid login after retry");
+    }
 
 }
