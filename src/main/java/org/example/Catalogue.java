@@ -20,4 +20,14 @@ public class Catalogue {
     public int getCatalogueSize(){
         return catalogue.size();
     }
+
+    public Book findBookByTitle(String title) {
+        if (title == null) return null;
+        for (Book book : catalogue) {
+            if (book.getTitle().equalsIgnoreCase(title)) {
+                return book;
+            }
+        }
+        return null;
+    }
 }

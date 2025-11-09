@@ -13,6 +13,15 @@ public class AuthSystem {
         this.users = users;
     }
 
+    boolean authenticate(String username, String password) {
+        Borrow borrower = users.findByUsername(username);
+        if (borrower != null && borrower.passwordMatches(password)) {
+            currentUser = borrower;
+            return true;
+        }
+        return false;
+    }
+
     public void promptLogin(Scanner input, PrintWriter output) {
 
         while (true) {
@@ -24,35 +33,52 @@ public class AuthSystem {
             if (!input.hasNextLine()) break;
             String password = input.nextLine().trim();
 
-            Borrow borrower = users.findByUsername(username);
-            if (borrower != null && borrower.passwordMatches(password)) {
-                currentUser = borrower;
+            if (authenticate(username, password)) {
                 output.println("Login successful. Welcome, " + username + "!");
 
-                checkNotifications(borrower, output);
-
+                checkNotifications(currentUser, output);
                 displayMenu(output);
                 break;
 
             } else {
                 output.println("Invalid credentials.");
             }
-
         }
     }
 
-    public void checkNotifications(Borrow borrower, PrintWriter output) {
+    List<Book> getNotificationBooks(Borrow borrower) {
+        List<Book> notifications = new java.util.ArrayList<>();
+
+        if (borrower == null) {
+            return notifications;
+        }
+
         List<Book> heldBooks = borrower.getHolds();
         if (heldBooks.isEmpty()) {
-            output.println("No new notifications.");
-            return;
+            return notifications;
         }
 
         for (Book book : heldBooks) {
             if (book.getStatus() == BookStatus.ON_HOLD &&
                     book.getHoldQueue().peek() == borrower) {
-                output.println("Notification: Book '" + book.getTitle() + "' is now available for you to borrow.");
+                notifications.add(book);
             }
+        }
+
+        return notifications;
+    }
+
+    public void checkNotifications(Borrow borrower, PrintWriter output) {
+        List<Book> notifications = getNotificationBooks(borrower);
+
+        if (notifications.isEmpty()) {
+            output.println("No new notifications.");
+            return;
+        }
+
+        for (Book book : notifications) {
+            output.println("Notification: Book '" + book.getTitle()
+                    + "' is now available for you to borrow.");
         }
     }
 
@@ -86,15 +112,27 @@ public class AuthSystem {
         }
     }
 
+    Book borrowAvailableBook(Catalogue catalogue, int index) {
+        if (catalogue == null) return null;
+        if (index < 0 || index >= catalogue.getCatalogueSize()) {
+            return null;
+        }
+
+        Book book = catalogue.getBook(index);
+        if (book.getStatus() == BookStatus.AVAILABLE) {
+            return book;
+        }
+        return null;
+    }
+
     public Book borrowBook(Catalogue catalogue, Scanner input, PrintWriter output) {
         output.println("Select a book to borrow (1-" + catalogue.getCatalogueSize() + "):");
         int choice = Integer.parseInt(input.nextLine()) - 1;
 
-        Book book = catalogue.getBook(choice);
-        if (book.getStatus() == BookStatus.AVAILABLE) {
+        Book book = borrowAvailableBook(catalogue, choice);
+        if (book != null) {
             output.println("You selected: " + book.getTitle());
             output.println("Author: " + book.getAuthor());
-
             return book;
         } else {
             output.println("Sorry, that book is not available.");
@@ -152,6 +190,31 @@ public class AuthSystem {
         displayMenu(output);
     }
 
+    boolean unavailableBookStatus(Borrow borrower, Book book) {
+        if (borrower == null || book == null) {
+            return false;
+        }
+
+        // Borrower already has this book checked out → no hold needed/allowed
+        if (borrower.getBorrowedBooks().contains(book)) {
+            return false;
+        }
+
+        // Borrower already has a hold on this book → no extra hold needed
+        if (borrower.getHolds().contains(book)) {
+            return false;
+        }
+
+        // Book is unavailable for others (checked out or on hold) → can offer a hold
+        if (book.getStatus() == BookStatus.CHECKED_OUT ||
+                book.getStatus() == BookStatus.ON_HOLD) {
+            return true;
+        }
+
+        // Book is available, no hold needed
+        return false;
+    }
+
     public boolean unavailableBook(Borrow borrower, Catalogue catalogue, Book book, PrintWriter output) {
         // If borrower already has the book checked out
         if (borrower.getBorrowedBooks().contains(book)) {
@@ -160,7 +223,6 @@ public class AuthSystem {
             return false;
         }
 
-
         // If borrower already has a hold on the book
         if (borrower.getHolds().contains(book)) {
             output.println("You already have a hold on this book");
@@ -168,16 +230,25 @@ public class AuthSystem {
             return false;
         }
 
-
-        // If book is unavailable for others
-        if (book.getStatus() == BookStatus.CHECKED_OUT || book.getStatus() == BookStatus.ON_HOLD) {
+        // Use core logic to decide if we should offer a hold
+        if (unavailableBookStatus(borrower, book)) {
             output.println("Book is unavailable. Would you like to place a hold?");
             return true;
         }
 
+        // Book is available, no hold needed
+        return false;
+    }
 
-        return false; // book is available, no hold needed
+    boolean hold(Borrow borrower, Book book) {
+        if (borrower == null || book == null) return false;
 
+        if (borrower.getBorrowedCount() == 3 && book.getStatus() == BookStatus.AVAILABLE) {
+            book.addHold(borrower);
+            return true; // hold successfully placed
+        }
+
+        return false; // conditions not met
     }
 
     public void offerHold(Borrow borrower, Book book, Catalogue catalogue, Scanner input, PrintWriter output) {
@@ -186,8 +257,12 @@ public class AuthSystem {
 
             String choice = input.nextLine().trim();
             if (choice.equalsIgnoreCase("Y")) {
-                book.addHold(borrower);
-                output.println("Hold successfully placed for book: " + book.getTitle());
+                boolean placed = hold(borrower, book);
+                if (placed) {
+                    output.println("Hold successfully placed for book: " + book.getTitle());
+                } else {
+                    output.println("Unable to place hold due to rule restrictions.");
+                }
             } else {
                 output.println("Hold not placed.");
             }
@@ -196,8 +271,13 @@ public class AuthSystem {
         }
     }
 
+    boolean hasReachedBorrowLimit(Borrow borrower) {
+        if (borrower == null) return false;
+        return borrower.getBorrowedCount() >= 3;
+    }
+
     public void borrowMax(Borrow borrower, PrintWriter output) {
-        if (borrower.getBorrowedCount() >= 3) {
+        if (hasReachedBorrowLimit(borrower)) {
             output.println("Maximum borrowing limit reached");
             displayMenu(output);
         }
@@ -218,6 +298,16 @@ public class AuthSystem {
         return borrowed;
     }
 
+    Book selectReturnBookCore(Borrow borrower, int index) {
+        if (borrower == null) return null;
+        List<Book> borrowed = borrower.getBorrowedBooks();
+
+        if (borrowed.isEmpty()) return null;
+        if (index < 0 || index >= borrowed.size()) return null;
+
+        return borrowed.get(index);
+    }
+
     public Book selectReturnBook(Borrow borrower, Scanner input, PrintWriter output) {
         List<Book> borrowed = displayBorrowedBooks(borrower, output);
 
@@ -231,16 +321,17 @@ public class AuthSystem {
         }
 
         int choice = Integer.parseInt(input.nextLine()) - 1;
-        if (choice >= 0 && choice < borrowed.size()) {
-            return borrowed.get(choice);
-        }
+        return selectReturnBookCore(borrower, choice);
+    }
 
-        return null;
+    boolean hasPendingHolds(Book book) {
+        if (book == null) return false;
+        return !book.getHoldQueue().isEmpty();
     }
 
     public boolean checkPendingHolds(Book book, PrintWriter output) {
         output.println("Checking for pending holds...");
-        return !book.getHoldQueue().isEmpty();
+        return hasPendingHolds(book);
     }
 
     public void holdUpdate(Borrow borrower, Book book) {
@@ -269,9 +360,13 @@ public class AuthSystem {
         displayMenu(output);
     }
 
+    void logoutUser() {
+        currentUser = null;
+    }
+
     public void logout(Scanner input, PrintWriter output) {
         output.println("You have successfully logged out.");
-        currentUser = null;
+        logoutUser();
 
         output.println("Please login with your username and password");
         promptLogin(input, output);
