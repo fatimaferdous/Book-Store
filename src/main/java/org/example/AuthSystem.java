@@ -170,6 +170,12 @@ public class AuthSystem {
 
     public void updateAccountStatus(Borrow borrower, Book book) {
         if (borrower != null && book != null) {
+            if (!book.getHoldQueue().isEmpty()) {
+                Borrow head = book.getHoldQueue().peek();
+                if (head.getUsername().equals(borrower.getUsername())) {
+                    book.getHoldQueue().remove();
+                }
+            }
             if (!borrower.getBorrowedBooks().contains(book)) {
                 borrower.addBorrowedBook(book, calculateDueDate());
             }
@@ -283,8 +289,13 @@ public class AuthSystem {
         }
     }
 
+    public List<Book> getBorrowedBooksCore(Borrow borrower) {
+        if (borrower == null) return List.of();
+        return borrower.getBorrowedBooks();
+    }
+
     public List<Book> displayBorrowedBooks(Borrow borrower, PrintWriter output) {
-        List<Book> borrowed = borrower.getBorrowedBooks();
+        List<Book> borrowed = getBorrowedBooksCore(borrower);
         if (borrowed.isEmpty()) {
             output.println("No books currently borrowed.");
             displayMenu(output);
@@ -371,6 +382,5 @@ public class AuthSystem {
         output.println("Please login with your username and password");
         promptLogin(input, output);
     }
-
 
 }
