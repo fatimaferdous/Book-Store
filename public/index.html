@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>COMP4004 Library</title>
+  </head>
+  <body>
+    <h1 id="app-title">Library Management System</h1>
+
+    <!-- Global success/error messages -->
+    <div id="message" data-testid="global-message"></div>
+
+    <!-- LOGIN SECTION -->
+    <section id="login-section">
+      <h2>Login</h2>
+      <label>
+        Username:
+        <input id="username" name="username" data-testid="username-input" />
+      </label>
+      <label>
+        Password:
+        <input
+          id="password"
+          name="password"
+          type="password"
+          data-testid="password-input"
+        />
+      </label>
+      <button id="login-btn" data-testid="login-button">Login</button>
+    </section>
+
+    <!-- MAIN APP SECTION (only shown when logged in) -->
+    <section id="app-section" style="display: none">
+      <div>
+        Logged in as: <strong id="current-user" data-testid="current-user"></strong>
+        <button id="logout-btn" data-testid="logout-button">Logout</button>
+      </div>
+
+      <p>
+        Borrowed books:
+        <span id="borrowed-count" data-testid="borrowed-count">0</span>
+      </p>
+
+      <!-- View Available Books -->
+      <h2>Books</h2>
+      <button id="refresh-books-btn" data-testid="refresh-books-button">
+        Refresh Books
+      </button>
+
+      <table id="books-table" border="1" data-testid="books-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="books-tbody"></tbody>
+      </table>
+
+      <!-- My Borrowed Books -->
+      <h2>My Borrowed Books</h2>
+      <ul id="my-borrowed-list" data-testid="my-borrowed-list"></ul>
+
+      <!-- Notifications -->
+      <h2>Notifications</h2>
+      <button
+        id="refresh-notifications-btn"
+        data-testid="refresh-notifications-button"
+      >
+        Refresh Notifications
+      </button>
+      <ul id="notifications-list" data-testid="notifications-list"></ul>
+    </section>
+
+    <script src="main.js"></script>
+  </body>
+</html>
